@@ -36,6 +36,9 @@ Pweek.Preload.prototype = {
     this.load.spritesheet('green', 'assets/puyos/green.png', 48, 48, 3);
     this.load.spritesheet('ninja', 'assets/puyos/ninja.png', 48, 48, 3);
 
+    this.load.spritesheet('horizontal', 'assets/puyos/horizontal.png', 48, 48, 6);
+    this.load.spritesheet('vertical', 'assets/puyos/vertical.png', 48, 48, 6);
+
     // buttons
     this.load.image('pause_button', 'assets/buttons/pause_button.png');
 

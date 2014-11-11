@@ -27,6 +27,29 @@ Pweek.Game.prototype = {
                 {'font': '20px arial', 'fill': '#FFFFFF'});
     }
 
+    this.linkSpritesH = new Array(LINES);
+    for (var l = 0; l < LINES; l++) {
+        this.linkSpritesH[l] = new Array(COLUMNS - 1);
+        for (var c = 0; c < COLUMNS - 1; c++) {
+            var coord = this.convertPosition(c, l);
+            this.linkSpritesH[l][c] = this.game.add.sprite(coord[0] + 24, coord[1], 'horizontal');
+            this.linkSpritesH[l][c].anchor.x = .5;
+            this.linkSpritesH[l][c].anchor.y = .5;
+        }
+    }
+    this.linkSpritesV = new Array(LINES - 1);
+    for (var l = 0; l < LINES - 1; l++) {
+        this.linkSpritesV[l] = new Array(COLUMNS);
+        for (var c = 0; c < COLUMNS; c++) {
+            var coord = this.convertPosition(c, l);
+            this.linkSpritesV[l][c] = this.game.add.sprite(coord[0], coord[1] - 24, 'vertical');
+            this.linkSpritesV[l][c].anchor.x = .5;
+            this.linkSpritesV[l][c].anchor.y = .5;
+        }
+    }
+
+
+
     this.gridSprites = new Array(LINES * 2);
     for (var l = 0; l < LINES * 2; l++) {
         this.gridSprites[l] = new Array(COLUMNS);
@@ -238,12 +261,55 @@ Pweek.Game.prototype = {
               var y = this.convertPosition(0, l)[1];
               if (s && s.position.y != y) {
                   s.frame = 1;
-                  Pweek.game.add.tween(s)
+                  this.game.add.tween(s)
                       .to({y: y}, 3 * (y - s.position.y),
                               Phaser.Easing.Bounce.Out, true)
                       .onComplete.add(function() {
                           this.frame = 2;
                       }, s);
+              }
+
+              // XXX
+              if (l < LINES) {
+                this.cleanLinks(l, c);
+              }
+          }
+      }
+      var t = this.game.time.create();
+      t.add(500, this.updateLinks, this);
+      t.start();
+  },
+  cleanLinks: function(l, c) {
+    if (c > 0) {
+        this.linkSpritesH[l][c - 1].frame = 0;
+    }
+    if (c < COLUMNS - 1) {
+        this.linkSpritesH[l][c].frame = 0;
+    }
+    if (l > 0) {
+        this.linkSpritesV[l - 1][c].frame = 0;
+    }
+    if (l < LINES - 1) {
+        this.linkSpritesV[l][c].frame = 0;
+    }
+  },
+  updateLinks: function() {
+      for (var l = 0; l < LINES - 1; l++) {
+          for (var c = 0; c < COLUMNS; c++) {
+              if (this.logic.grid[l][c] == this.logic.grid[l + 1][c]) {
+                this.linkSpritesV[l][c].frame = this.logic.grid[l][c];
+              } else {
+                this.linkSpritesV[l][c].frame = 0;
+              }
+          }
+      }
+
+      for (var l = 0; l < LINES; l++) {
+          for (var c = 0; c < COLUMNS - 1; c++) {
+              if (this.logic.grid[l][c] == this.logic.grid[l][c + 1]) {
+                this.linkSpritesH[l][c].frame = this.logic.grid[l][c];
+              } else {
+                this.linkSpritesH[l][c].frame = 0;
               }
           }
       }
