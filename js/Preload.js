@@ -14,8 +14,11 @@ Pweek.Preload.prototype = {
     this.load.image('background', 'assets/background.png');
 
     this.load.image('pweek', 'assets/menu/pweek.png');
+    this.load.image('quit', 'assets/menu/quit.png');
     this.load.image('solo', 'assets/menu/solo.png');
     this.load.image('chrono', 'assets/menu/chrono.png');
+    this.load.image('touchtostart', 'assets/menu/touchtostart.png');
+    this.load.image('gameover', 'assets/menu/gameover.png');
 
     // panels
     this.load.image('main-panel', 'assets/panels/main-panel.png');

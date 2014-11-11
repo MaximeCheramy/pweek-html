@@ -287,8 +287,12 @@ Pweek.GameLogic.prototype.update = function(delta) {
                     this.combo *= 2;
                 }
             } else {
-                this.generate();
-                this.state = 'move';
+                if (this.generate()) {
+                    this.state = 'move';
+                } else {
+                    this.state = 'lost';
+                    this.game.gameover();
+                }
             }
 
             this.sum = 0;
@@ -352,20 +356,7 @@ Pweek.GameLogic.prototype.gravity = function() {
         }
     }
 
-    for (var l = 0; l < LINES * 2; l++) {
-        for (var c = 0; c < COLUMNS; c++) {
-            var s = this.game.gridSprites[l][c];
-            var y = this.game.convertPosition(0, l)[1];
-            if (s && s.position.y != y) {
-                s.frame = 1;
-                Pweek.game.add.tween(s)
-                    .to({y: y}, 3 * (y - s.position.y),
-                            Phaser.Easing.Bounce.Out, true)
-                    .onComplete.add(function() {this.frame = 2;}, s);
-            }
-        }
-    }
-
+    this.game.gravity();
 };
 
 Pweek.GameLogic.prototype.generate = function() {
@@ -374,6 +365,10 @@ Pweek.GameLogic.prototype.generate = function() {
     this.nextPiece = new Pweek.Piece(this);
     this.game.createPiece();
     this.game.dispPiece();
+
+    var p1 = this.piece.coords[0];
+    var p2 = this.piece.coords[1];
+    return this.grid[p1[0]][p1[1]] == 0 && this.grid[p2[0]][p2[1]] == 0;
 };
 
 Pweek.GameLogic.prototype.rotateLeft = function() {
@@ -416,12 +411,8 @@ Pweek.GameLogic.prototype.putDown = function() {
     var p2 = this.piece.coords[1];
     this.grid[p1[0]][p1[1]] = p1[2];
     this.grid[p2[0]][p2[1]] = p2[2];
-    this.game.gridSprites[p1[0]][p1[1]] = this.game.s1;
-    this.game.gridSprites[p2[0]][p2[1]] = this.game.s2;
-    this.game.s1.frame = 2;
-    this.game.s2.frame = 2;
+
+    this.game.putDown();
     this.piece = null;
-    this.game.white.position.x = -100;
-    this.game.white.position.y = -100;
 };
 

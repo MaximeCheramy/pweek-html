@@ -7,6 +7,8 @@ spriteName = ['', 'yellow', 'red', 'blue', 'green', 'ninja'];
 //setting game configuration and loading the assets for the loading screen
 Pweek.Game.prototype = {
   create: function() {
+    this.started = false;
+
     // Background
     this.game.add.image(0, 0, 'background');
     this.game.add.image(150, 80, 'main-panel');
@@ -17,8 +19,9 @@ Pweek.Game.prototype = {
     this.white.anchor.x = .5;
     this.white.anchor.y = .5;
 
-    this.scoreText = this.game.add.text(260, 20, '0',
-            {'fill': '#FFFFFF', 'align': 'right'});
+    this.scoreText = this.game.add.text(296, 20, '0',
+            {'font': '26px arial', 'fill': '#FFFFFF'});
+    this.scoreText.anchor.x = 1;
     if (this.mode == 'solo') {
         this.levelText = this.game.add.text(40, 270, 'Level 1',
                 {'font': '20px arial', 'fill': '#FFFFFF'});
@@ -32,9 +35,11 @@ Pweek.Game.prototype = {
     this.ns1 = null;
     this.ns2 = null;
 
-    this.logic = new Pweek.GameLogic(this);
-    this.createPiece();
-    this.logic.init();
+    var startbtn = this.game.add.image(this.game.width / 2,
+            this.game.height / 2, 'touchtostart');
+    startbtn.anchor.x = .5;
+    startbtn.anchor.y = .5;
+
 
     this.cursors = this.game.input.keyboard.createCursorKeys();
 
@@ -67,33 +72,47 @@ Pweek.Game.prototype = {
     }, this);
 
     this.game.input.onUp.add(function(pointer) {
-        var dx = Math.abs(this.pointer.position.x - this.startPointX);
-        var dy = Math.abs(this.pointer.position.y - this.startPointY);
-        if (this.logic.state == 'move' &&
-                this.pointer.duration < 150 && this.pointer.duration > 2 &&
-                dx < 10 && dy < 10) {
-            this.logic.rotateLeft();
+        if (this.started) {
+            var dx = Math.abs(this.pointer.position.x - this.startPointX);
+            var dy = Math.abs(this.pointer.position.y - this.startPointY);
+            if (this.logic.state == 'move' &&
+                    this.pointer.duration < 150 && this.pointer.duration > 2 &&
+                    dx < 10 && dy < 10) {
+                this.logic.rotateLeft();
+            }
+        } else {
+            this.start(startbtn);
         }
         this.pointer = null;
     }, this);
 
   },
   update: function() {
-      this.logic.update(this.game.time.elapsed);
-      if (this.pointer && this.logic.state == 'move') {
-            var dx = this.pointer.position.x - this.startPointX;
-            var dy = this.pointer.position.y - this.startPointY;
-            if (dx > 48) {
-                this.logic.moveRight();
-                this.startPointX = this.pointer.position.x;
-            } else if (dx < -48) {
-                this.logic.moveLeft();
-                this.startPointX = this.pointer.position.x;
-            } else if (dy > 100) {
-                this.logic.moveDownAndPut();
-                this.startPointY = this.pointer.position.y;
-            }
+      if (this.started) {
+          this.logic.update(this.game.time.elapsed);
+          if (this.pointer && this.logic.state == 'move') {
+                var dx = this.pointer.position.x - this.startPointX;
+                var dy = this.pointer.position.y - this.startPointY;
+                if (dx > 48) {
+                    this.logic.moveRight();
+                    this.startPointX = this.pointer.position.x;
+                    this.startPointY = this.pointer.position.y;
+                } else if (dx < -48) {
+                    this.logic.moveLeft();
+                    this.startPointX = this.pointer.position.x;
+                    this.startPointY = this.pointer.position.y;
+                } else if (dy > 100) {
+                    this.logic.moveDownAndPut();
+                }
+          }
       }
+  },
+  start: function(b) {
+    this.logic = new Pweek.GameLogic(this);
+    this.createPiece();
+    this.logic.init();
+    this.started = true;
+    b.kill();
   },
   updateLevel: function(level) {
     this.levelText.setText('Level ' + level);
@@ -105,12 +124,12 @@ Pweek.Game.prototype = {
     this.state.start('Game');
   },
   convertPosition: function(x, y) {
-    var xconv = 172 + x * 52;
+    var xconv = 176 + x * 52;
     var yconv = 652 - y * 50;
     return [xconv, yconv];
   },
   positionNextPiece: function(x, y) {
-    var xconv = 48 + x * 52;
+    var xconv = 46 + x * 52;
     var yconv = 140 - y * 50;
     return [xconv, yconv];
   },
@@ -182,7 +201,9 @@ Pweek.Game.prototype = {
       }
   },
   addScore: function(x, y, score) {
-    var t = this.game.add.text(x, y, score);
+    var t = this.game.add.text(x, y, score,
+                {'font': '26px arial', 'fill': '#FFFFFF'});
+    t.anchor.x = 1;
     this.game.add.tween(t)
         .to({x: this.scoreText.position.x}, 500,
                 Phaser.Easing.Linear.None, true)
@@ -194,5 +215,39 @@ Pweek.Game.prototype = {
         .to({y: this.scoreText.position.y}, 500,
                 Phaser.Easing.Exponential.Out, true)
         .onComplete.add(function() { this.destroy(); }, t);
+  },
+  putDown: function() {
+    var p1 = this.logic.piece.coords[0];
+    var p2 = this.logic.piece.coords[1];
+
+    this.gridSprites[p1[0]][p1[1]] = this.s1;
+    this.gridSprites[p2[0]][p2[1]] = this.s2;
+    this.s1.frame = 2;
+    this.s2.frame = 2;
+    this.white.position.x = -100;
+    this.white.position.y = -100;
+  },
+  gravity: function() {
+      for (var l = 0; l < LINES * 2; l++) {
+          for (var c = 0; c < COLUMNS; c++) {
+              var s = this.gridSprites[l][c];
+              var y = this.convertPosition(0, l)[1];
+              if (s && s.position.y != y) {
+                  s.frame = 1;
+                  Pweek.game.add.tween(s)
+                      .to({y: y}, 3 * (y - s.position.y),
+                              Phaser.Easing.Bounce.Out, true)
+                      .onComplete.add(function() {
+                          this.frame = 2;
+                      }, s);
+              }
+          }
+      }
+  },
+  gameover: function() {
+      var gameover = this.game.add.image(this.game.width / 2,
+              200, 'gameover');
+      gameover.anchor.x = .5;
+      gameover.anchor.y = .5;
   }
 };
