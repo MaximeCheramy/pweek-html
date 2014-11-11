@@ -19,6 +19,8 @@ Pweek.Preload.prototype = {
     this.load.image('chrono', 'assets/menu/chrono.png');
     this.load.image('touchtostart', 'assets/menu/touchtostart.png');
     this.load.image('gameover', 'assets/menu/gameover.png');
+    this.load.image('retry', 'assets/menu/retry.png');
+    this.load.image('continue', 'assets/menu/continue.png');
 
     // panels
     this.load.image('main-panel', 'assets/panels/main-panel.png');
@@ -33,6 +35,10 @@ Pweek.Preload.prototype = {
     this.load.spritesheet('blue', 'assets/puyos/blue.png', 48, 48, 3);
     this.load.spritesheet('green', 'assets/puyos/green.png', 48, 48, 3);
     this.load.spritesheet('ninja', 'assets/puyos/ninja.png', 48, 48, 3);
+
+    // buttons
+    this.load.image('pause_button', 'assets/buttons/pause_button.png');
+
   },
   create: function() {
     this.state.start('MainMenu');

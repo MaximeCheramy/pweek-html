@@ -2,7 +2,7 @@ var Pweek = Pweek || {};
 
 Pweek.Game = function() {};
 
-spriteName = ['', 'yellow', 'red', 'blue', 'green', 'ninja'];
+spriteName = ['', 'yellow', 'red', 'green', 'blue', 'ninja'];
 
 //setting game configuration and loading the assets for the loading screen
 Pweek.Game.prototype = {
@@ -10,7 +10,7 @@ Pweek.Game.prototype = {
     this.started = false;
 
     // Background
-    this.game.add.image(0, 0, 'background');
+    var bg = this.game.add.image(0, 0, 'background');
     this.game.add.image(150, 80, 'main-panel');
     this.game.add.image(200, 0, 'top-panel');
     this.game.add.image(12, 245, 'top-panel');
@@ -40,6 +40,7 @@ Pweek.Game.prototype = {
     startbtn.anchor.x = .5;
     startbtn.anchor.y = .5;
 
+    var pausebtn = this.game.add.button(10, 10, 'pause_button', this.showPauseMenu, this);
 
     this.cursors = this.game.input.keyboard.createCursorKeys();
 
@@ -65,18 +66,23 @@ Pweek.Game.prototype = {
         this.logic.moveDownAndPut();
     }, this);
 
-    this.game.input.onDown.add(function(pointer) {
+    bg.inputEnabled = true;
+    bg.input.priorityID = 0;
+    bg.events.onInputDown.add(function(img, pointer) {
         this.startPointX = pointer.position.x;
         this.startPointY = pointer.position.y;
         this.pointer = pointer;
     }, this);
 
-    this.game.input.onUp.add(function(pointer) {
+    bg.events.onInputUp.add(function(img, pointer) {
         if (this.started) {
             var dx = Math.abs(this.pointer.position.x - this.startPointX);
             var dy = Math.abs(this.pointer.position.y - this.startPointY);
+            var duration = this.pointer.timeUp - this.pointer.timeDown;
+            console.log(duration);
+            console.log(this.pointer, pointer);
             if (this.logic.state == 'move' &&
-                    this.pointer.duration < 150 && this.pointer.duration > 2 &&
+                    duration < 180 && duration > 2 &&
                     dx < 10 && dy < 10) {
                 this.logic.rotateLeft();
             }
@@ -249,5 +255,55 @@ Pweek.Game.prototype = {
               200, 'gameover');
       gameover.anchor.x = .5;
       gameover.anchor.y = .5;
+
+    var t = this.game.add.button(this.game.width / 2, 450, 'retry',
+                this.replay, this);
+    t.anchor.set(.5, .5);
+	this.game.add.tween(t).from({y: 450 + 500}, 800,
+            Phaser.Easing.Back.Out, true);
+
+    t = this.game.add.button(this.game.width / 2, 650, 'quit',
+            this.quit, this);
+    t.anchor.set(.5, .5);
+	this.game.add.tween(t).from({y: 650 + 500}, 800,
+            Phaser.Easing.Back.Out, true);
+  },
+  showPauseMenu: function() {
+      if (this.started == false) {
+        return;
+      }
+    this.started = false;
+
+
+    var t2 = this.game.add.button(this.game.width / 2, 650, 'quit',
+            this.quit, this);
+    t2.anchor.set(.5, .5);
+	this.game.add.tween(t2).from({y: 650 + 500}, 800,
+            Phaser.Easing.Back.Out, true);
+
+    var t = this.game.add.button(this.game.width / 2, 450, 'continue',
+                function() {
+                    t2.kill();
+                    t.kill();
+                    this.showGrid();
+                    this.started = true;
+                }, this);
+    t.anchor.set(.5, .5);
+	this.game.add.tween(t).from({y: 450 + 500}, 800,
+            Phaser.Easing.Back.Out, true);
+
+    this.hideGrid();
+  },
+  showGrid: function() {
+    // TODO
+  },
+  hideGrid: function() {
+    // TODO
+  },
+  replay: function() {
+    this.game.state.start('Game');
+  },
+  quit: function() {
+    this.game.state.start('MainMenu');
   }
 };
