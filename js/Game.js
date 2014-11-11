@@ -76,13 +76,11 @@ Pweek.Game.prototype = {
 
     bg.events.onInputUp.add(function(img, pointer) {
         if (this.started) {
-            var dx = Math.abs(this.pointer.position.x - this.startPointX);
-            var dy = Math.abs(this.pointer.position.y - this.startPointY);
-            var duration = this.pointer.timeUp - this.pointer.timeDown;
-            console.log(duration);
-            console.log(this.pointer, pointer);
+            var dx = Math.abs(pointer.positionUp.x - pointer.positionDown.x);
+            var dy = Math.abs(pointer.positionUp.y - pointer.positionDown.y);
+            var duration = pointer.timeUp - pointer.timeDown;
             if (this.logic.state == 'move' &&
-                    duration < 180 && duration > 2 &&
+                    duration < 150 && duration > 2 &&
                     dx < 10 && dy < 10) {
                 this.logic.rotateLeft();
             }
