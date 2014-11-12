@@ -255,8 +255,9 @@ Pweek.Game.prototype = {
     this.white.position.y = -100;
   },
   gravity: function() {
-      for (var l = 0; l < LINES * 2; l++) {
-          for (var c = 0; c < COLUMNS; c++) {
+      for (var c = 0; c < COLUMNS; c++) {
+          var clean = -1;
+          for (var l = 0; l < LINES * 2; l++) {
               var s = this.gridSprites[l][c];
               var y = this.convertPosition(0, l)[1];
               if (s && s.position.y != y) {
@@ -267,12 +268,13 @@ Pweek.Game.prototype = {
                       .onComplete.add(function() {
                           this.frame = 2;
                       }, s);
+                  if (clean == -1) {
+                    clean = l;
+                  }
               }
-
-              // XXX
-              if (l < LINES) {
-                this.cleanLinks(l, c);
-              }
+          }
+          if (clean < LINES && clean != -1) {
+              this.cleanLinks(clean, c);
           }
       }
       var t = this.game.time.create();
@@ -280,17 +282,19 @@ Pweek.Game.prototype = {
       t.start();
   },
   cleanLinks: function(l, c) {
-    if (c > 0) {
-        this.linkSpritesH[l][c - 1].frame = 0;
-    }
-    if (c < COLUMNS - 1) {
-        this.linkSpritesH[l][c].frame = 0;
-    }
-    if (l > 0) {
-        this.linkSpritesV[l - 1][c].frame = 0;
-    }
-    if (l < LINES - 1) {
-        this.linkSpritesV[l][c].frame = 0;
+    for (var i = l; i < LINES; i++) {
+        if (c > 0) {
+            this.linkSpritesH[i][c - 1].frame = 0;
+        }
+        if (c < COLUMNS - 1) {
+            this.linkSpritesH[i][c].frame = 0;
+        }
+        if (i > 0) {
+            this.linkSpritesV[i - 1][c].frame = 0;
+        }
+        if (i < LINES - 1) {
+            this.linkSpritesV[i][c].frame = 0;
+        }
     }
   },
   updateLinks: function() {
@@ -323,13 +327,13 @@ Pweek.Game.prototype = {
     var t = this.game.add.button(this.game.width / 2, 450, 'retry',
                 this.replay, this);
     t.anchor.set(.5, .5);
-	this.game.add.tween(t).from({y: 450 + 500}, 800,
+    this.game.add.tween(t).from({y: 450 + 500}, 800,
             Phaser.Easing.Back.Out, true);
 
     t = this.game.add.button(this.game.width / 2, 650, 'quit',
             this.quit, this);
     t.anchor.set(.5, .5);
-	this.game.add.tween(t).from({y: 650 + 500}, 800,
+    this.game.add.tween(t).from({y: 650 + 500}, 800,
             Phaser.Easing.Back.Out, true);
   },
   showPauseMenu: function() {
@@ -342,7 +346,7 @@ Pweek.Game.prototype = {
     var t2 = this.game.add.button(this.game.width / 2, 650, 'quit',
             this.quit, this);
     t2.anchor.set(.5, .5);
-	this.game.add.tween(t2).from({y: 650 + 500}, 800,
+    this.game.add.tween(t2).from({y: 650 + 500}, 800,
             Phaser.Easing.Back.Out, true);
 
     var t = this.game.add.button(this.game.width / 2, 450, 'continue',
@@ -353,7 +357,7 @@ Pweek.Game.prototype = {
                     this.started = true;
                 }, this);
     t.anchor.set(.5, .5);
-	this.game.add.tween(t).from({y: 450 + 500}, 800,
+    this.game.add.tween(t).from({y: 450 + 500}, 800,
             Phaser.Easing.Back.Out, true);
 
     this.hideGrid();

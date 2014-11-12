@@ -277,9 +277,6 @@ Pweek.GameLogic.prototype.update = function(delta) {
                 this.addScore(b[0], b[1],
                         r.length * 10 * (r.length - 3 + this.combo));
             }
-
-            //XXX
-            this.game.updateLinks();
         }
         if (this.sum > 300) {
             if (this.removes.length > 0) {
@@ -338,6 +335,8 @@ Pweek.GameLogic.prototype.resolve = function() {
             }
         }
     }
+
+    this.game.updateLinks();
 
     return remove;
 };
