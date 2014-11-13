@@ -25,6 +25,8 @@ Pweek.Game.prototype = {
     if (this.mode == 'solo') {
         this.levelText = this.game.add.text(40, 270, 'Level 1',
                 {'font': '20px arial', 'fill': '#FFFFFF'});
+    } else {
+        this.timeText = this.game.add.text(20, 270, '', {'font': '18px arial', 'fill': '#FFFFFF'});
     }
 
     this.linkSpritesH = new Array(LINES);
@@ -132,10 +134,18 @@ Pweek.Game.prototype = {
                     this.logic.moveDownAndPut();
                 }
           }
+
+          if (this.timeText) {
+              if (this.logic.timeLeft() > 0) {
+                this.timeText.setText('Time left: ' + Math.floor(this.logic.timeLeft() / 1000));
+              } else {
+                this.timeText.setText('Time out!');
+              }
+          }
       }
   },
   start: function(b) {
-    this.logic = new Pweek.GameLogic(this);
+    this.logic = new Pweek.GameLogic(this, this.mode);
     this.createPiece();
     this.logic.init();
     this.started = true;
