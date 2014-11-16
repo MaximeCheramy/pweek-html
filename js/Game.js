@@ -7,6 +7,11 @@ spriteName = ['', 'yellow', 'red', 'green', 'blue', 'ninja'];
 //setting game configuration and loading the assets for the loading screen
 Pweek.Game.prototype = {
   create: function() {
+	this.scoreMax = localStorage.getItem(this.mode);
+	if (!this.scoreMax) {
+		this.scoreMax = 0;
+	}
+
     this.started = false;
 
     // Background
@@ -22,6 +27,11 @@ Pweek.Game.prototype = {
     this.scoreText = this.game.add.text(296, 20, '0',
             {'font': '26px arial', 'fill': '#FFFFFF'});
     this.scoreText.anchor.x = 1;
+
+    this.scoreMaxText = this.game.add.text(80, 320, 'High Score:\n\n' + this.scoreMax,
+            {'font': '26px arial', 'fill': '#000000', 'align': 'center'});
+    this.scoreMaxText.anchor.x = .5;
+
     if (this.mode == 'solo') {
         this.levelText = this.game.add.text(40, 270, 'Level 1',
                 {'font': '20px arial', 'fill': '#FFFFFF'});
@@ -345,6 +355,16 @@ Pweek.Game.prototype = {
     t.anchor.set(.5, .5);
     this.game.add.tween(t).from({y: 650 + 500}, 800,
             Phaser.Easing.Back.Out, true);
+
+	if (this.scoreMax < this.logic.score) {
+		t = this.game.add.image(this.game.width / 2, 315, 'highscore');
+		t.anchor.set(.5, .5);
+
+		t = this.game.add.text(this.game.width/2, 315, 'Score: ' + this.logic.score + '\nNew high score!', {'align': 'center', 'fill': '#FFFFFF'});
+		t.anchor.set(.5, .5);
+
+		localStorage.setItem(this.mode, this.logic.score);
+	}
   },
   showPauseMenu: function() {
       if (this.started == false) {

@@ -5,9 +5,12 @@ Pweek.Preload = function() {};
 //setting game configuration and loading the assets for the loading screen
 Pweek.Preload.prototype = {
   preload: function() {
-    this.preloadBar = this.add.sprite(this.game.world.centerX,
-            this.game.world.centerY + 128, 'preloadbar');
-    this.preloadBar.anchor.setTo(0.5);
+    var t = this.add.sprite(this.game.world.centerX,
+            this.game.world.centerY - 100, 'logo');
+    t.anchor.setTo(.5, .5);
+
+    this.preloadBar = this.add.sprite(this.game.world.centerX - 128,
+            600, 'preloadbar');
 
     this.load.setPreloadSprite(this.preloadBar);
 
@@ -21,6 +24,7 @@ Pweek.Preload.prototype = {
     this.load.image('gameover', 'assets/menu/gameover.png');
     this.load.image('retry', 'assets/menu/retry.png');
     this.load.image('continue', 'assets/menu/continue.png');
+    this.load.image('highscore', 'assets/menu/highscore.png');
 
     // panels
     this.load.image('main-panel', 'assets/panels/main-panel.png');

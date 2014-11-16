@@ -14,7 +14,7 @@ Pweek.Boot.prototype = {
     this.scale.refresh();
   },
   preload: function() {
-    //assets we'll use in the loading screen
+    this.load.image('logo', 'assets/logo.png');
     this.load.image('preloadbar', 'assets/preloader-bar.png');
   },
   create: function() {
