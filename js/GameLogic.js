@@ -212,7 +212,9 @@ Pweek.GameLogic.prototype.barycenter = function(r) {
 };
 
 Pweek.GameLogic.prototype.update = function(delta) {
-	this.gameDuration += this.game.time.elapsed;
+	if (this.state != 'lost') {
+		this.gameDuration += this.game.time.elapsed;
+	}
 
 	if (this.game.mode != 'solo' && this.timeLeft() <= 0 && this.state != 'lost') {
 		this.state = 'lost';
