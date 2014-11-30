@@ -13,6 +13,7 @@ Pweek.Game.prototype = {
 	}
 
     this.started = false;
+    this.logic = null;
 
     // Background
     var bg = this.game.add.image(0, 0, 'background');
@@ -119,7 +120,7 @@ Pweek.Game.prototype = {
                     dx < 10 && dy < 10) {
                 this.logic.rotateLeft();
             }
-        } else {
+        } else if (!this.logic) {
             this.start(startbtn);
         }
         this.pointer = null;

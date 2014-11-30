@@ -155,9 +155,9 @@ Pweek.Piece.prototype.rotateLeft = function(grid) {
 
 
 Pweek.GameLogic = function(game, mode) {
-	this.mode = mode;
-    this.state = 'move';
-	this.gameDuration = 0;
+    this.mode = mode;
+    this.state = 'wait';
+    this.gameDuration = 0;
     this.score = 0;
     this.game = game;
 
@@ -188,10 +188,11 @@ Pweek.GameLogic = function(game, mode) {
 
 Pweek.GameLogic.prototype.init = function() {
     this.generate();
+    this.state = 'move';
 };
 
 Pweek.GameLogic.prototype.timeLeft = function() {
-	return 120000 - this.gameDuration;
+    return 120000 - this.gameDuration;
 };
 
 Pweek.GameLogic.prototype.addScore = function(x, y, score) {
@@ -212,14 +213,14 @@ Pweek.GameLogic.prototype.barycenter = function(r) {
 };
 
 Pweek.GameLogic.prototype.update = function(delta) {
-	if (this.state != 'lost') {
-		this.gameDuration += this.game.time.elapsed;
-	}
+    if (this.state != 'lost') {
+        this.gameDuration += this.game.time.elapsed;
+    }
 
-	if (this.game.mode != 'solo' && this.timeLeft() <= 0 && this.state != 'lost') {
-		this.state = 'lost';
-		this.game.gameover();
-	}
+    if (this.game.mode != 'solo' && this.timeLeft() <= 0 && this.state != 'lost') {
+        this.state = 'lost';
+        this.game.gameover();
+    }
 
     /*if (level >= 5 && timeGarbage > 12.0f / (level - 4)) {
         gameLogic.sendGarbage(1);
